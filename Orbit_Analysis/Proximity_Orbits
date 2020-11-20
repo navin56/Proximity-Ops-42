@@ -1,5 +1,5 @@
 %General Mission Analysis Tool(GMAT) Script
-%Created: 2020-11-19 23:28:39
+%Created: 2020-11-20 21:08:33
 
 
 %----------------------------------------
@@ -11,8 +11,8 @@ GMAT TargetSC.DateFormat = UTCGregorian;
 GMAT TargetSC.Epoch = '08 Sep 2020 11:59:28.000';
 GMAT TargetSC.CoordinateSystem = EarthMJ2000Eq;
 GMAT TargetSC.DisplayStateType = Keplerian;
-GMAT TargetSC.SMA = 42163.99999999982;
-GMAT TargetSC.ECC = 3.75806456684378e-16;
+GMAT TargetSC.SMA = 42163.99999999981;
+GMAT TargetSC.ECC = 0;
 GMAT TargetSC.INC = 0;
 GMAT TargetSC.RAAN = 0;
 GMAT TargetSC.AOP = 0;
@@ -98,14 +98,6 @@ GMAT Formation1.Add = {ChaserSC, TargetSC};
 
 
 
-
-
-
-
-
-
-
-
 %----------------------------------------
 %---------- ForceModels
 %----------------------------------------
@@ -170,7 +162,6 @@ Create CoordinateSystem SC;
 GMAT SC.Origin = TargetSC;
 GMAT SC.Axes = BodyFixed;
 
-
 %----------------------------------------
 %---------- Solvers
 %----------------------------------------
@@ -189,9 +180,9 @@ GMAT DC1.Algorithm = NewtonRaphson;
 
 Create OrbitView DefaultOrbitView;
 GMAT DefaultOrbitView.SolverIterations = Current;
-GMAT DefaultOrbitView.UpperLeft = [ 0.1458333333333333 0.06631762652705062 ];
-GMAT DefaultOrbitView.Size = [ 0.9940476190476191 0.9301919720767888 ];
-GMAT DefaultOrbitView.RelativeZOrder = 362;
+GMAT DefaultOrbitView.UpperLeft = [ 0.1458333333333333 0.05775075987841945 ];
+GMAT DefaultOrbitView.Size = [ 0.9940476190476191 0.939209726443769 ];
+GMAT DefaultOrbitView.RelativeZOrder = 1408;
 GMAT DefaultOrbitView.Maximized = true;
 GMAT DefaultOrbitView.Add = {TargetSC, ChaserSC, Earth};
 GMAT DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
@@ -220,9 +211,9 @@ GMAT DefaultOrbitView.EnableConstellations = On;
 
 Create XYPlot OrbitRadiusPlot;
 GMAT OrbitRadiusPlot.SolverIterations = Current;
-GMAT OrbitRadiusPlot.UpperLeft = [ 0.1458333333333333 0.06631762652705062 ];
-GMAT OrbitRadiusPlot.Size = [ 0.9940476190476191 0.9301919720767888 ];
-GMAT OrbitRadiusPlot.RelativeZOrder = 369;
+GMAT OrbitRadiusPlot.UpperLeft = [ 0.1458333333333333 0.05775075987841945 ];
+GMAT OrbitRadiusPlot.Size = [ 0.9940476190476191 0.939209726443769 ];
+GMAT OrbitRadiusPlot.RelativeZOrder = 1412;
 GMAT OrbitRadiusPlot.Maximized = true;
 GMAT OrbitRadiusPlot.XVariable = ChaserSC.ElapsedSecs;
 GMAT OrbitRadiusPlot.YVariables = {ChaserSC.Earth.RMAG, TargetSC.Earth.RMAG};
@@ -231,9 +222,9 @@ GMAT OrbitRadiusPlot.ShowPlot = true;
 
 Create XYPlot OrbitVelocityPlot;
 GMAT OrbitVelocityPlot.SolverIterations = Current;
-GMAT OrbitVelocityPlot.UpperLeft = [ 0.1458333333333333 0.06631762652705062 ];
-GMAT OrbitVelocityPlot.Size = [ 0.9940476190476191 0.9301919720767888 ];
-GMAT OrbitVelocityPlot.RelativeZOrder = 374;
+GMAT OrbitVelocityPlot.UpperLeft = [ 0.1458333333333333 0.05775075987841945 ];
+GMAT OrbitVelocityPlot.Size = [ 0.9940476190476191 0.939209726443769 ];
+GMAT OrbitVelocityPlot.RelativeZOrder = 1416;
 GMAT OrbitVelocityPlot.Maximized = true;
 GMAT OrbitVelocityPlot.XVariable = ChaserSC.ElapsedSecs;
 GMAT OrbitVelocityPlot.YVariables = {ChaserSC.EarthMJ2000Eq.VMAG, TargetSC.EarthMJ2000Eq.VMAG};
@@ -242,12 +233,12 @@ GMAT OrbitVelocityPlot.ShowPlot = true;
 
 Create XYPlot XYPlot1;
 GMAT XYPlot1.SolverIterations = Current;
-GMAT XYPlot1.UpperLeft = [ 0.1458333333333333 0.06631762652705062 ];
-GMAT XYPlot1.Size = [ 0.9940476190476191 0.9301919720767888 ];
-GMAT XYPlot1.RelativeZOrder = 415;
+GMAT XYPlot1.UpperLeft = [ 0.1458333333333333 0.05775075987841945 ];
+GMAT XYPlot1.Size = [ 0.9940476190476191 0.939209726443769 ];
+GMAT XYPlot1.RelativeZOrder = 1426;
 GMAT XYPlot1.Maximized = true;
 GMAT XYPlot1.XVariable = ChaserSC.ElapsedSecs;
-GMAT XYPlot1.YVariables = {PosLVLH(1,1), PosLVLH(2,1), PosLVLH(3,1)};
+GMAT XYPlot1.YVariables = {PosLVLH1(1,1), PosLVLH1(2,1), PosLVLH1(3,1)};
 GMAT XYPlot1.ShowGrid = true;
 GMAT XYPlot1.ShowPlot = true;
 
@@ -259,7 +250,7 @@ GMAT ReportFile1.RelativeZOrder = 0;
 GMAT ReportFile1.Maximized = false;
 GMAT ReportFile1.Filename = '/home/navin/Desktop/Reorbit-Problem/Orbit_Analysis/Report.txt';
 GMAT ReportFile1.Precision = 16;
-GMAT ReportFile1.Add = {PosLVLH(1,1), PosLVLH(2,1), PosLVLH(3,1)};
+GMAT ReportFile1.Add = {PosLVLH1(1,1), PosLVLH1(2,1), PosLVLH1(3,1)};
 GMAT ReportFile1.WriteHeaders = true;
 GMAT ReportFile1.LeftJustify = On;
 GMAT ReportFile1.ZeroFill = Off;
@@ -271,19 +262,19 @@ GMAT ReportFile1.WriteReport = true;
 %----------------------------------------
 %---------- Functions
 %----------------------------------------
+Create GmatFunction ECI2LVLH;
+GMAT ECI2LVLH.FunctionPath = '/home/navin/Desktop/Reorbit-Problem/Orbit_Analysis/ECI2LVLH.gmf';
 
 Create GmatFunction cross;
-GMAT cross.FunctionPath = '../userfunctions/gmat/cross.gmf';
+GMAT cross.FunctionPath = '/home/navin/Desktop/GMAT/R2016a/userfunctions/gmat/cross.gmf';
 
 %----------------------------------------
 %---------- Arrays, Variables, Strings
 %----------------------------------------
 
-Create Array PosLVLH[3,1] LVLHDCM[3,3] H[3,1] R[3,1] V[3,1] Temp[3,1] UnitR[3,1];
+Create Array PosLVLH1[3,1] LVLHDCM[3,3] R[3,1] R1[3,1] V[3,1] V1[3,1] PosDiff[3,1];
 Create Variable OrbitPropTime i;
 GMAT OrbitPropTime = 0;
-
-
 
 
 
@@ -295,6 +286,18 @@ GMAT OrbitPropTime = 0;
 
 BeginMissionSequence;
 Propagate 'CoastPhase11' OrbitPropogator(Formation1) {ChaserSC.Earth.Apoapsis, ChaserSC.Earth.Apoapsis};
+
+%--------------------------------------------------------
+%---------- Vary Coast Phase to Reduce In Track Distance
+%--------------------------------------------------------
+
+%Target 'InTrackVary' DC1 {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
+%   Vary 'VaryPropTime' DC1(OrbitPropTime = 0.5, {Perturbation = 0.0001, Lower = 0.0, Upper = 4, MaxStep = 1, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+%   Propagate 'PropVary' OrbitPropogator(Formation1) {ChaserSC.ElapsedDays = OrbitPropTime};
+%   Achieve 'AchieveInTrack' DC1(PosLVLH(2,1) = 10, {Tolerance = 0.1});
+%EndTarget;  % For targeter DC1
+
+
 Target 'DeltaVCompute' DC1 {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
    Vary 'OrbitRaise1' DC1(ProximityBurn.Element1 = 0.0004437965906414399, {Perturbation = 0.005, Lower = 0.0, Upper = 0.08, MaxStep = 0.1, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
    Maneuver 'OrbitRaiseBurn1' ProximityBurn(ChaserSC);
@@ -311,34 +314,24 @@ Target 'DeltaVCompute' DC1 {SolveMode = Solve, ExitMode = DiscardAndContinue, Sh
    Achieve 'Proximity' DC1(ChaserSC.Earth.RMAG = 42163.5, {Tolerance = 0.000001});
    
    % Convert ECI to LVLH.
-   % Compute the DCM using Orbital parameters.
-   
    % Copy R and V Inertial vectors.
-   GMAT R(1,1) = TargetSC.EarthMJ2000Eq.X - ChaserSC.EarthMJ2000Eq.X;
-   GMAT R(2,1) = TargetSC.EarthMJ2000Eq.Y - ChaserSC.EarthMJ2000Eq.Y;
-   GMAT R(3,1) = TargetSC.EarthMJ2000Eq.Z - ChaserSC.EarthMJ2000Eq.Z;
+   GMAT R(1,1) = TargetSC.EarthMJ2000Eq.X;
+   GMAT R(2,1) = TargetSC.EarthMJ2000Eq.Y;
+   GMAT R(3,1) = TargetSC.EarthMJ2000Eq.Z;
    
-   GMAT UnitR = R/(ChaserSC.Earth.RMAG);
+   GMAT R1(1,1) = ChaserSC.EarthMJ2000Eq.X;
+   GMAT R1(2,1) = ChaserSC.EarthMJ2000Eq.Y;
+   GMAT R1(3,1) = ChaserSC.EarthMJ2000Eq.Z;
    
-   GMAT V(1,1) = ChaserSC.EarthMJ2000Eq.VX;
-   GMAT V(2,1) = ChaserSC.EarthMJ2000Eq.VY;
-   GMAT V(3,1) = ChaserSC.EarthMJ2000Eq.VZ;
+   GMAT V(1,1) = TargetSC.EarthMJ2000Eq.VX;
+   GMAT V(2,1) = TargetSC.EarthMJ2000Eq.VY;
+   GMAT V(3,1) = TargetSC.EarthMJ2000Eq.VZ;
    
-   % Compute Angular Momentum vector
-   GMAT H = -cross(R,V)/norm(cross(R,V));
-   For i = 1:1:3;
-      GMAT LVLHDCM(1,i) = -UnitR(i,1);
-      GMAT LVLHDCM(2,i) = -H(i,1);
-   EndFor;
-   
-   GMAT [Temp] = cross(H, UnitR);
-   
-   For i = 1:1:3;
-      GMAT LVLHDCM(3,1) = Temp(i,1);
-   EndFor;
+   GMAT [LVLHDCM] = ECI2LVLH(R, V);
    
    % Compute LVLH
-   GMAT PosLVLH = LVLHDCM*R;
+   GMAT PosDiff = R - R1;
+   GMAT PosLVLH1 = LVLHDCM*PosDiff;
    
 EndTarget;  % For targeter DC1
 Propagate OrbitPropogator(Formation1) {ChaserSC.ElapsedDays = 2};
