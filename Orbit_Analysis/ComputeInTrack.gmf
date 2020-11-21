@@ -1,0 +1,17 @@
+function [InTrackDist, DCM] = ComputeInTrack(TargetR, TargetV, ChaserR, ChaserV)
+
+% Local Arrays
+Create Array DCM[3,3] PosDiff[3,1] TargetR[3,1] TargetV[3,1] ChaserR[3,1] ChaserV[3,1]
+Create Array InTrackDist[3,1]
+
+BeginMissionSequence
+
+% Compute the DCM from ECI to LVLH Frame.
+DCM = ECI2LVLH(TargetR, TargetV)
+
+% Compute Position of Target and Chaser in LVLH Frame.
+PosDiff = ChaserR - TargetR
+InTrackDist = DCM * PosDiff
+
+% As per frame definition eZ is Radial, eY is Cross Track and eX is In Track
+%InTrackDist = PosDiff(1,1)

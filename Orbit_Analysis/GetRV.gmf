@@ -1,0 +1,17 @@
+function [R, V] = GetRV(SC)
+
+Create Spacecraft SC
+Create Array R[3,1] V[3,1]
+
+% Utility to copy R,V in ECI to output Arrays.
+% SC is a Spacecraft Object
+
+BeginMissionSequence
+
+R(1,1) = SC.EarthMJ2000Eq.X
+R(2,1) = SC.EarthMJ2000Eq.Y
+R(3,1) = SC.EarthMJ2000Eq.Z
+
+V(1,1) = SC.EarthMJ2000Eq.VX
+V(2,1) = SC.EarthMJ2000Eq.VY
+V(3,1) = SC.EarthMJ2000Eq.VZ
