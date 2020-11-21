@@ -1,30 +1,31 @@
 function [LVLHDCM] = ECI2LVLH(R, V)
 
 % Arrays to Hold the unit vectors of the Instantaneous LVLH Frame.
-Create Array LVLHDCM[3,3] RUnit[3,1] H[3,1] eZ[3,1] eY[3,1] eX[3,1]
+Create Array LVLHDCM[3,3] RUnit[3,1] H[3,1] eZ[3,1] eY[3,1] eX[3,1] R[3] V[3]
 Create Array Test[3]
 Create Variable i
 
 BeginMissionSequence
 
 % Compute Unit Momentum Vector.()
-eY(1,1) = -norm(R(2,1)*V(3,1) - V(2,1)*R(3,1)) 
-eY(2,1) = -norm(-(R(1,1)*V(3,1) - V(1,1)*R(3,1)))
-eY(3,1) = -norm(R(1,1)*V(2,1) - V(1,1)*R(2,1))
+eY(1,1) = (R(2,1)*V(3,1) - V(2,1)*R(3,1)) 
+eY(2,1) = (-(R(1,1)*V(3,1) - V(1,1)*R(3,1)))
+eY(3,1) = (R(1,1)*V(2,1) - V(1,1)*R(2,1))
 
-eY = eY/norm(eY);
+eY = -eY/norm(eY);
 
 % Compute Unit Radial Vector.
-eZ = R/norm(R);
+eZ = -R/norm(R);
 
 % Compute Unit In track Vector.
 eX(1,1) = eY(2,1)*eZ(3,1) - eZ(2,1)*eY(3,1)
 eX(2,1) = -(eY(1,1)*eZ(3,1) - eZ(1,1)*eY(3,1))
 eX(3,1) = eY(1,1)*eZ(2,1) - eZ(1,1)*eY(2,1)
 
-% Return DCM
+% Return DCM 
+% Is Norm correct ? Probably not
 For i=1:3
-	LVLHDCM(1,i) = norm(eX(i,1))
-	LVLHDCM(2,i) = norm(eY(i,1))
-	LVLHDCM(3,i) = norm(eZ(i,1))
+	LVLHDCM(i,1) = (eX(i,1))
+	LVLHDCM(i,2) = (eY(i,1))
+	LVLHDCM(i,3) = (eZ(i,1))
 EndFor
