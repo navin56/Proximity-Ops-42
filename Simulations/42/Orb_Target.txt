@@ -17,7 +17,7 @@ AE                            !  Use Peri/Apoapsis (PA) or min alt/ecc (AE)
 0.0                           !  Inclination (deg)
 0.0                           !  Right Ascension of Ascending Node (deg)
 0.0                           !  Argument of Periapsis (deg)
-0.0125                        !  True Anomaly (deg)
+5.0                           !  True Anomaly (deg)
 6678.0  0.0  0.0              !  RV Initial Position (km)
 0.0  8.5  0.0                 !  RV Initial Velocity (km/sec)
 TRV  "EXAMPLE 1"              !  TLE or TRV format, Label to find in file
