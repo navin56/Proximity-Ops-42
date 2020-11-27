@@ -2,7 +2,7 @@
 Simple generic S/C            !  Description
 "Chaser S/C"                  !  Label
 GenScSpriteAlpha.ppm          !  Sprite File Name
-PROTOTYPE_FSW                 !  Flight Software Identifier
+PROX_FSW                 !  Flight Software Identifier
 0.2                           !  FSW Sample Time, sec
 ************************* Orbit Parameters ****************************
 EULER_HILL                    !  Orbit Prop FIXED, EULER_HILL, ENCKE, or COWELL
