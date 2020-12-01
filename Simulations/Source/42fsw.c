@@ -1696,14 +1696,43 @@ void AdHocFSW(struct SCType *S)
       for(i=0;i<3;i++) AC->IdealTrq[i] = C->Tcmd[i];
 }
 
+/* Function to compute time derivative of a Unit Vector. */
+void UnitVecDot(double u[3], double udot[3], double *uhatd)
+{
+   double uhat[3], temp[3], mag;
+   unsigned int i;
+
+   memcpy(uhat, u, 3 * sizeof(double));
+   /* Normalize u to a unit vector. */
+   mag = UNITV(uhat);
+   if (mag == 0)
+   {
+      /* Singularity */
+      memset(uhatd, 0x0, 3 * sizeof(double));
+      return;
+   }
+   else
+   {
+      for (i = 0; i < 3; i++)
+      {   
+         temp[i] = VoV(uhat, udot) * uhat[i];
+         uhatd[i] = (udot[i] - temp[i])/mag;
+      }   
+   }
+}
+
 /* Function to Compute DCM from ECI to LVLH frame centered on Target. */
 void ECI2LVLH(double *TargetR, 
               double *TargetV, 
-              double DCM[3][3]
+              double DCM[3][3],
+              double DCMdot[3][3]
               )
 {
    /* Private Variables. */
    double EX[3], EY[3], EZ[3], H[3];
+
+   /* Time Derivative unit vectors. */
+   double EXdot[3], EYdot[3], EZdot[3];
    unsigned int i;
 
    /* Compute Angular Momentum Vector. H = RxV */
@@ -1714,13 +1743,22 @@ void ECI2LVLH(double *TargetR,
    /* EY = -H */
    for (i = 0; i < 3; i++)
    {
-      EX[i] = -TargetR[i];
+      EZ[i] = -TargetR[i];
       EY[i] = -H[i];
    }
-   UNITV(EX);
+   UNITV(EZ);
    
-   /* EZ = EY x EX */
-   VxV(EY, EX, EZ);
+   /* EX = EY x EZ */
+   VxV(EY, EZ, EX);
+
+   /* Assuming no External torque. */
+   UnitVecDot(TargetR, TargetV, EZdot);
+   for (i = 0; i < 3; i++)
+   {
+      EZdot[i] = - EZdot[i];
+   }
+   memset(EYdot, 0x0, 3 * sizeof(double));
+   VxV(EY, EZdot, EXdot);
 
    /* Form the DCM */
    for (i = 0; i < 3; i++)
@@ -1728,6 +1766,10 @@ void ECI2LVLH(double *TargetR,
       DCM[0][i] = EX[i];
       DCM[1][i] = EY[i];
       DCM[2][i] = EZ[i];
+
+      DCMdot[0][i] = EXdot[i];
+      DCMdot[1][i] = EYdot[i];
+      DCMdot[2][i] = EZdot[i];
    }
 }
 
@@ -1740,11 +1782,11 @@ void ComputeRelativeLVLH(double *TargetR,
                          double *RelV)
 {
    /* Private Variables. */
-   double DifferenceR[3], DifferenceV[3], DCM[3][3];
+   double DifferenceR[3], DifferenceV[3], DCM[3][3], DCMdot[3][3], temp[3], temp1[3];
    unsigned int i;
 
    /* Compute DCM. */
-   ECI2LVLH(TargetR, TargetV, DCM);
+   ECI2LVLH(TargetR, TargetV, DCM, DCMdot);
 
    for (i = 0; i < 3; i++)
    {
@@ -1752,13 +1794,59 @@ void ComputeRelativeLVLH(double *TargetR,
       DifferenceV[i] = ChaserV[i] - ChaserV[i];
    }
 
-   /* Add Relative Velocity Computations Later. */
-   memset(RelV, 0x0, 3 * sizeof(double));
-
    /* Compute Relative Position. */
    MxV(DCM, DifferenceR, RelR);
+
+   /* Relative Velocity. */
+   MxV(DCMdot, DifferenceR, temp);
+   MxV(DCM, DifferenceV, temp1);
+   
+   for (i = 0; i < 3; i++)
+   {
+      RelV[i] = temp[i] + temp1[i];
+   }
 }
 
+/** Implement CW Relative Motion Equations.
+ *  Reference : HARDWARE-IN-THE LOOP TESTS OF AN AUTONOMOUS GN&C SYSTEM FOR ON-ORBIT SERVICING
+ *  V-Bar Maneuver
+ */
+void ClosedLoopGuidance(double *RelR, 
+                        double *RelV)
+{
+   double MeanMotion, Tf;
+   double DeltaV[3], Vec[3];
+
+   static unsigned int delay = 0;
+   const double InTrackFinal = -500.0;
+
+   delay += 1;
+
+   MeanMotion = Orb[1].MeanMotion;
+
+   /* Solve for Maneuver Time Tf */
+   Tf = 2 * atan((RelR[0] - InTrackFinal)/(2 * RelR[2])) + TwoPi;
+   Tf = fabs(Tf)/MeanMotion;
+
+   /* Compute Radial Vel,  */
+   DeltaV[0] = - MeanMotion * (RelR[2] / tan(Tf));
+   DeltaV[1] = - 2 * MeanMotion * (RelR[2]);
+   DeltaV[2] = 0;
+
+   MTxV(Orb->CLN, DeltaV, Vec);
+
+   /* Impart Delta V */
+   Orb[1].VelN[0] += Vec[0];
+   Orb[1].VelN[1] += Vec[1];
+   Orb[2].VelN[2] += Vec[2];
+
+   if(delay == 250)
+   {
+      printf("Velocity : [%lf \t %lf \t %lf] \n", Vec[0], Vec[1], Vec[2]);
+      //printf("Mean Motion : %f  \t Maneuver Time : %f \n", MeanMotion, Tf);
+      delay = 0;
+   }
+}
 
 /**********************************************************************/
 /* PROX_FSW: Uses CW Algorithms for Closed loop Proximity Ops.        */
@@ -1767,17 +1855,10 @@ void ProxFsw(struct SCType *S)
 {
    /* Variables to store Target State Vectors. */
    double TargetR[3], TargetV[3], RelR[3], RelV[3];
-   unsigned int i; 
    static unsigned int count = 0;
 
    count += 1;
-   /* Constant to store In-track Threshold. */
-   //const double Intrack_Thresh = 100.0;
 
-   /* We Don't care about SC Attitude for the time being. () */
-   //struct AcType *AC;
-   //AC = &S->AC;
-   
    /* Get Target SC States. The Assumption is SC[0] is the Target. */
    if (SC[0].Exists)
    {
@@ -1796,12 +1877,13 @@ void ProxFsw(struct SCType *S)
    if (count == 250)
    {
       /* Down Sample the Printf to every 50 Seconds.*/
-      for (i = 0; i < 3; i++)
-      {
-         printf("Relative Distance[%d] : %f \n", i, RelR[i]);  
-      }
+      printf("Relative Distance : [%f \t %f \t %f] \n", RelR[0], RelR[1], RelR[2]);
+      printf("Relative Velocity : [%f \t %f \t %f] \n", RelV[0], RelV[1], RelV[2]);  
       count = 0;
    }
+   /* Compute Guidance Here. */
+   ClosedLoopGuidance(RelR, RelV);
+
 }
 /**********************************************************************/
 /*  This function is called at the simulation rate.  Sub-sampling of  */
