@@ -132,7 +132,7 @@ void Report(void)
       static char First = TRUE;
       /* Files for SC[1] */
       static FILE *PosNfile1, *VelNfile1;
-
+      static FILE *Basfile;
       long Isc,i;
       struct DynType *D;
       double CBL[3][3],Roll,Pitch,Yaw;
@@ -188,6 +188,7 @@ void Report(void)
          Hwhlfile = FileOpen(InOutPath,"Hwhl.42","w");
          MTBfile = FileOpen(InOutPath,"MTB.42","w");
          AccFile = FileOpen(InOutPath,"Acc.42","w");
+         Basfile = FileOpen(InOutPath,"basilisk.42","w");
       }
 
       if (OutFlag) {
@@ -277,6 +278,24 @@ void Report(void)
                   SC[1].VelN[0],SC[1].VelN[1],SC[1].VelN[2]);
             }
             
+            /** Output Text File in Basilisk Format. 
+             *  Format: time[s], inertial Pos[m], inertial Vel[m/s], Attitude
+             *  Delimiter: ','
+             *  SC[0] States SC[1] States \n
+             */
+            fprintf(Basfile, "%f,", SimTime);
+            fprintf(Basfile, "%f,%f,%f,", SC[0].PosN[0], SC[0].PosN[1], SC[0].PosN[2]);      /* Target SC Position  */
+            fprintf(Basfile, "%f,%f,%f,", SC[0].VelN[0], SC[0].VelN[1], SC[0].VelN[2]);      /* Target SC Velocity  */
+            fprintf(Basfile, "%f,%f,%f,%f,",
+            SC[0].B[0].qn[0],SC[0].B[0].qn[1],SC[0].B[0].qn[2],SC[0].B[0].qn[3]);            /* Target SC Attitude */
+            fprintf(Basfile, "%f,%f,%f,", SC[0].AC.wbn[0],SC[0].AC.wbn[1],SC[0].AC.wbn[2]);  /* Target Angular Velocity */
+
+            fprintf(Basfile, "%f,%f,%f,", SC[1].PosN[0], SC[1].PosN[1], SC[1].PosN[2]);      /* Chaser SC Position  */
+            fprintf(Basfile, "%f,%f,%f,", SC[1].VelN[0], SC[1].VelN[1], SC[1].VelN[2]);      /* Chaser SC Velocity  */
+            fprintf(Basfile, "%f,%f,%f,%f,",
+            SC[1].B[0].qn[0],SC[1].B[0].qn[1],SC[1].B[0].qn[2],SC[1].B[0].qn[3]);            /* Chaser SC Attitude */
+            fprintf(Basfile, "%f,%f,%f", SC[1].AC.wbn[0],SC[1].AC.wbn[1],SC[1].AC.wbn[2]);   /* Chaser Angular Velocity */
+            fprintf(Basfile, "\n");                                                          /* Newline for next timestep. */
 
             //MagReport();
             //GyroReport();
